@@ -1,0 +1,213 @@
+---
+title: "ggplot"
+format: html
+editor: visual
+---
+
+```{r}
+library(palmerpenguins)
+library(tidyverse)
+
+penguins
+```
+```{r}
+filter(penguins, species == "Adelie")
+```
+```{r}
+penguins |> 
+  filter(sex == "female")
+```
+```{r}
+filter(penguins, bill_length_mm > 40)
+```
+```{r}
+penguins |> 
+  mutate(flipper_length_cm = flipper_length_mm / 10)
+```
+
+```{r}
+penguins |> 
+  group_by(island) |> 
+summarise(count = n())
+```
+
+```{r}
+penguins |> 
+  count(island)
+```
+
+```{r}
+penguins |> 
+  summarise(count = n(), .by = island)
+```
+
+```{r}
+penguins |> 
+  summarise(avg_flipper_mm = mean(flipper_length_mm, na.rm = TRUE), .by = species)
+
+penguins |> 
+  filter(is.na(flipper_length_mm)) |> 
+  summarise(avg_flipper_mm = mean(flipper_length_mm), .by = species)
+```
+
+```{r}
+penguins |> 
+  filter(!is.na(sex),
+         !is.na(flipper_length_mm)) |> 
+  group_by(species, sex) |> 
+  summarise(avg_flipper_mm = mean(flipper_length_mm))
+```
+
+
+## Visualizations with ggplot2
+
+## Grammar of graphics
+1. data
+2. map data to asethetics such as position, size, and color: `aes()`
+3. geometric shape used to represent the data: geom_*()`
+4. the statistical transformations applied to the data: `stat_*()`
+5. the scales used for mapping the data to the asethetic demensions: `scale_*()`
+6. coordinate system for mapping the plane of the data: `coor_*()`
+7. Visual non-data components of the plot such as titles, labels, background, gridlines, and legands: `theme() or theme_*()`
+
+## Building our first plot one layer at a time
+
+```{r}
+ggplot(data = penguins)
+
+
+ggplot(data = penguins,
+       mapping = aes(x = flipper_length_mm, y = body_mass_g))
+
+
+ggplot(data = penguins,
+       mapping = aes(x = flipper_length_mm, y = body_mass_g)) +
+  geom_point()
+
+
+ggplot(data = penguins,
+       mapping = aes(x = flipper_length_mm, y = body_mass_g, color = species)) +
+  geom_point()
+
+
+# Mapping v Setting
+ggplot(data = penguins,
+       mapping = aes(x = flipper_length_mm, y = body_mass_g)), +
+  geom_point(color = "orange")
+
+
+ggplot(data = penguins,
+       mapping = aes(x = flipper_length_mm, y = body_mass_g, color = species)) +
+  geom_point() +
+  geom_smooth(method = "lm")
+
+
+ggplot(data = penguins,
+       mapping = aes(x = flipper_length_mm, y = body_mass_g,)) +
+  geom_point(mapping = aes(color = species)) +
+  geom_smooth(method = "lm")
+
+
+ggplot(data = penguins,
+       mapping = aes(x = flipper_length_mm, y = body_mass_g,)) +
+  geom_point(mapping = aes(color = sex, shape = species)) +
+  geom_smooth(method = "lm")
+
+
+penguins |> 
+  filter(!is.na(sex)) |> 
+  ggplot(data = penguins,
+       mapping = aes(x = flipper_length_mm, y = body_mass_g,)) +
+  geom_point(mapping = aes(color = sex, shape = species)) +
+  geom_smooth(method = "lm")
+```
+
+### Labels and scales
+
+```{r}
+ggplot(data = penguins,
+       mapping = aes(x = flipper_length_mm, y = body_mass_g,)) +
+  geom_point(mapping = aes(color = species, shape = species)) +
+  geom_smooth(method = "lm") +
+  labs(title = "Body Mass and Flipper Length", 
+       subtitle = "For Adelie, Chinstrap, Gentoo Penguins", 
+       x = "Flipper Length (mm)",
+       y = "Body Mass (g)",
+       color = "Species", shape = "Species") +
+  scale_color_brewer(type = "qual") +
+  theme_light()
+
+```
+
+### Visualizing Categorical Varibles
+
+```{r}
+ggplot(penguins, 
+       mapping = aes(x = species)) +
+  geom_bar()
+
+
+ggplot(penguins, 
+       mapping = aes(y = species)) +
+  geom_bar()
+
+ggplot(penguins, 
+       mapping = aes(x = species)) +
+  geom_bar() +
+  coord_flip()
+
+
+# Order bars bt count 
+ggplot(penguins, 
+       mapping = aes(x = fct_infreq(species))) +
+  geom_bar()
+
+# Stat
+penguins |> 
+  count(species) |> 
+  ggplot(aes(x = species, y = n)) +
+  geom_bar(stat = "identity")
+
+# geom_col
+penguins |> 
+  count(species) |> 
+  ggplot(aes(x = species, y = n)) +
+  geom_col()
+
+ ## Island talk
+
+ggplot(penguins, aes(x = island, fill = species)) +
+  geom_bar()
+
+ggplot(penguins, aes(x = island, fill = species)) +
+  geom_bar(position = "dodge")
+
+ggplot(penguins, aes(x = island, fill = species)) +
+geom_bar(position_dodge(preserve = "single")) +
+  labs(y = NULL)
+
+ggplot(penguins, aes(x = island, fill = species)) +
+  geom_bar(position_dodge(position = "fill")) 
+  
+
+```
+## Facceting
+
+```{r}
+penguins |> 
+  ggplot(data = penguins,
+       mapping = aes(x = flipper_length_mm, y = body_mass_g,)) +
+  geom_point(mapping = aes(color = species, shape = species)) +
+  facet_wrap(~island)
+ 
+
+```
+
+
+```{r}
+penguins |> 
+  mutate()
+```
+
+
+

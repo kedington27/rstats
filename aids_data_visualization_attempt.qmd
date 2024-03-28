@@ -1,0 +1,29 @@
+---
+title: "my_data_visualization"
+format: html
+editor: visual
+---
+
+library(tidyverse)
+```{r}
+library(tidyverse)
+library(here)
+aids <- read_csv(here("data_raw","aids.csv" ))
+```
+
+```{r}
+aids
+
+aids |> 
+  count(residence)
+
+ggplot(aids)
+ggplot(aids,
+       mapping = aes(x = pediatric, y= residence))
+
+ggplot(aids,
+       mapping = aes(x = pediatric, y = residence)) +
+  geom_point()
+
+```
+
